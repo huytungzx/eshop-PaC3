@@ -46,7 +46,7 @@ global:
   images:
     adservice: 894231944791.dkr.ecr.us-east-1.amazonaws.com/eshop-adservice:latest          # ex) 224166808254.dkr.ecr.us-east-1.amazonaws.com/eshop-adservice:latest  
     backend: 894231944791.dkr.ecr.us-east-1.amazonaws.com/eshop-backend:latest                                           # Amazon MQ 도전과제 시 주석처리 # ex) 224166808254.dkr.ecr.us-east-1.amazonaws.com/eshop-backend:latest  
-    cartservice: 894231944791.dkr.ecr.us-east-1.amazonaws.comeshop-cartservice:latest                                       # Amazon MQ 도전과제 시 주석처리 # ex) 224166808254.dkr.ecr.us-east-1.amazonaws.com/eshop-cartservice:latest  
+    cartservice: 894231944791.dkr.ecr.us-east-1.amazonaws.com/eshop-cartservice:latest                                       # Amazon MQ 도전과제 시 주석처리 # ex) 224166808254.dkr.ecr.us-east-1.amazonaws.com/eshop-cartservice:latest  
     # backend: 505891794208.dkr.ecr.ap-northeast-2.amazonaws.com/eshop-backend:amqtest            # Amazon MQ 도전과제 시 주석해제
     # cartservice: 505891794208.dkr.ecr.ap-northeast-2.amazonaws.com/eshop-cartservice:amqtest    # Amazon MQ 도전과제 시 주석해제
     frontend: 894231944791.dkr.ecr.us-east-1.amazonaws.com/eshop-frontend:latest           # ex) 224166808254.dkr.ecr.us-east-1.amazonaws.com/eshop-frontend:latest
