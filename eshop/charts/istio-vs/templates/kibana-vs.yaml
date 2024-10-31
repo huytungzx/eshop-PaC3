@@ -1,0 +1,35 @@
+## Istio + Keycloak + Oauth2 proxy 인증 적용
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: kibana-vs
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - ingress-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /kibana
+    route:
+    - destination:
+        host: eshop-kibana.eshop.svc.cluster.local
+        port:
+          number: 5601
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: kibana
+  namespace: eshop
+spec:
+  host: eshop-kibana.eshop.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+
+
+

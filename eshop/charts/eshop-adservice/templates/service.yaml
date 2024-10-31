@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: eshop-adservice
+spec:
+  type: ClusterIP
+  selector:
+    app: eshop-adservice
+  ports:
+  - port: 8095

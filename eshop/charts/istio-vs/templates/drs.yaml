@@ -1,0 +1,34 @@
+## frontend canary subsets
+# apiVersion: networking.istio.io/v1alpha3
+# kind: DestinationRule
+# metadata:
+#   name: eshop-frontend
+# spec:
+#   host: eshop-frontend
+#   trafficPolicy:
+#     tls:
+#       mode: DISABLE
+#   subsets:
+#   - name: v1
+#     labels:
+#       version: v1
+#   - name: v2
+#     labels:
+#       version: v2
+# ---
+
+## recommendservice circuit breaker
+# apiVersion: networking.istio.io/v1alpha3
+# kind: DestinationRule
+# metadata:
+#   name: eshop-recommendservice
+# spec:
+#   host: eshop-recommendservice
+#   trafficPolicy:
+#     tls:
+#       mode: DISABLE
+#     outlierDetection: # Circuit Breakers HAVE TO BE SWITCHED ON
+#       consecutive5xxErrors: 7
+#       interval: 5s
+#       baseEjectionTime: 10s
+#       maxEjectionPercent: 100

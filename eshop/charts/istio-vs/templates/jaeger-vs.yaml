@@ -1,0 +1,70 @@
+## Istio + Keycloak + Oauth2 proxy 인증 적용
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: jaeger-vs
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - ingress-gateway
+  http:
+  - match:
+    - uri:
+        exact: /jaeger
+    - uri:
+        prefix: /jaeger
+    # - uri:
+    #     prefix: /js
+    route:
+    - destination:
+        host: eshop-jaeger-query.eshop.svc.cluster.local
+        port:
+          number: 80
+  - match:
+    - uri:
+        regex: /jaeger
+    route:
+    - destination:
+        host: eshop-jaeger-query.eshop.svc.cluster.local
+        port:
+          number: 80
+
+  # - match:
+  #   - uri:
+  #       regex: /js
+  #   route:
+  #   - destination:
+  #       host: eshop-jaeger-query.eshop.svc.cluster.local
+  #       port:
+  #         number: 80
+
+  # - match:
+  #   - uri:
+  #       regex: /static
+  #   route:
+  #   - destination:
+  #       host: eshop-jaeger-query.eshop.svc.cluster.local
+  #       port:
+  #         number: 80
+
+  # - match:
+  #   - uri:
+  #       regex: /static/css/*
+  #   route:
+  #   - destination:
+  #       host: eshop-jaeger-query.eshop.svc.cluster.local
+  #       port:
+  #         number: 80
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: jaeger
+  namespace: eshop
+spec:
+  host: eshop-jaeger-query.eshop.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: DISABLE

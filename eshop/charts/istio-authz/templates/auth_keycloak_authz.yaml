@@ -1,0 +1,12 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: keycloak-authz
+  namespace: istio-system
+spec:
+  action: ALLOW
+  rules:
+    - to:
+      - operation:
+          methods: ["GET","POST","OPTIONS","PUT"]
+          paths: ["/identity/connect/auth/*", "/identity/connect/*"]

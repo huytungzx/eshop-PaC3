@@ -1,0 +1,143 @@
+## << 변수 >> 치환 필요
+
+## << ECR URI >>         : ex) 123456789012.dkr.ecr.us-east-1.amazonaws.com
+## << SERVICE NAME >>    : ex) eshop-backend
+## << TAG >>             : ex) latest
+## << DOMAIN >>          : 개인의 eshop Fully Qualified Domain Name    ex) eshop.mspt3.click  
+## .<< DOMAIN NAME >>    : ex) .mspt3.click (앞에 "."이 붙어있다).
+## << 개인 AWS RDS maria db endpoint >>  : service IaC(feature-c3_1 브랜치) 수행결과 Output에서 확인    ex) eshop-service-keycloackdb.cnm5l7zxyphs.us-west-2.rds.amazonaws.com
+## << 개인 AWS RDS maria db password >>  : service IaC(feature-c3_1 브랜치) 수행결과 Output에서 확인    ex) 1UTKQoWzqf
+
+global:
+  rabbitmq:
+    # << Amazon MQ AMQP Endpoint >>값 예시) amqps://b-124010ab-6315-439c-8884-5145399855df.mq.us-west-2.amazonaws.com:5671 값 중 프로토콜, 포트값을 뺀 값이 필요한 값 => b-124010ab-6315-439c-8884-5145399855df.mq.us-west-2.amazonaws.com
+    #host: << Amazon MQ AMQP Endpoint >>      # Amazon MQ 도전과제 시 주석해제 후 << Amazon MQ Web Console Endpoint >>에 값 치환
+    host: rabbitmq                                   # Amazon MQ 도전과제 시 주석처리
+  app:
+    name: eshop
+    namespace: eshop
+# Auth
+    url:
+      base: eshop.msp-t2-2024.click         # ex) eshop.mspt3.click  
+      domain: .msp-t2-2024.click # ex) .mspt3.click (앞에 "."이 붙어있다).
+# Auth
+  tls:
+    enabled: false          # True to enable TLS (set by deploy-all.ps1)
+    issuer: ""
+  ingress:                                              # ingress related settings
+    entries:
+      eshop-frontend: eshop-frontend
+      eshop-currencyservice: eshop-currencyservice
+      eshop-productservice: eshop-productservice
+      eshop-recommendservice: eshop-recommendservice
+      eshop-adservice: eshop-adservice
+      eshop-backend: eshop-backend
+      eshop-cartservice: eshop-cartservice
+      # spa: ""                                           # ingress entry for web spa
+  svc:
+    eshop-frontend: eshop-frontend
+    eshop-currencyservice: eshop-currencyservice
+    eshop-productservice: eshop-productservice
+    eshop-recommendservice: eshop-recommendservice
+    eshop-adservice: eshop-adservice
+    eshop-backend: eshop-backend
+    eshop-cartservice: eshop-cartservice
+    # spa: webspa                                       # service name for web spa
+  images:
+    adservice: 894231944791.dkr.ecr.us-east-1.amazonaws.com/eshop-adservice:latest          # ex) 224166808254.dkr.ecr.us-east-1.amazonaws.com/eshop-adservice:latest  
+    backend: 894231944791.dkr.ecr.us-east-1.amazonaws.com/eshop-backend:latest                                           # Amazon MQ 도전과제 시 주석처리 # ex) 224166808254.dkr.ecr.us-east-1.amazonaws.com/eshop-backend:latest  
+    cartservice: 894231944791.dkr.ecr.us-east-1.amazonaws.comeshop-cartservice:latest                                       # Amazon MQ 도전과제 시 주석처리 # ex) 224166808254.dkr.ecr.us-east-1.amazonaws.com/eshop-cartservice:latest  
+    # backend: 505891794208.dkr.ecr.ap-northeast-2.amazonaws.com/eshop-backend:amqtest            # Amazon MQ 도전과제 시 주석해제
+    # cartservice: 505891794208.dkr.ecr.ap-northeast-2.amazonaws.com/eshop-cartservice:amqtest    # Amazon MQ 도전과제 시 주석해제
+    frontend: 894231944791.dkr.ecr.us-east-1.amazonaws.com/eshop-frontend:latest           # ex) 224166808254.dkr.ecr.us-east-1.amazonaws.com/eshop-frontend:latest
+    currencyservice: 894231944791.dkr.ecr.us-east-1.amazonaws.com/eshop-currencyservice:latest    # ex) 224166808254.dkr.ecr.us-east-1.amazonaws.com/eshop-currencyservice:latest  
+    productservice: 894231944791.dkr.ecr.us-east-1.amazonaws.com/eshop-productservice:latest     # ex) 224166808254.dkr.ecr.us-east-1.amazonaws.com/eshop-productservice:latest  
+    recommendservice: 894231944791.dkr.ecr.us-east-1.amazonaws.com/eshop-recommendservice:latest      # ex) 224166808254.dkr.ecr.us-east-1.amazonaws.com/eshop-recommendservice:latest  
+  appinsights:
+    key: ""               # App insights to use
+  k8s:                      # inf.k8s defines Kubernetes cluster global config
+    dns:  ""                # k8s external  DNS. This value or ip value MUST BE PROVIDED
+    local: false            # True when deploying on "local K8s" provided by Docker Desktop.
+  hpa:
+    minReplicas: 1
+    maxReplicas: 18
+  misc:                     # inf.misc contains miscellaneous configuration related to infrastructure
+    useLoadTest: false      # If running under loading test or not
+    useAzureStorage: false  # If catalog api uses azure storage or not
+  lightweight:
+    kiali-server:
+      enabled: true
+    prometheus:
+      enabled: true
+    elasticsearch:
+      enabled: true
+    grafana:
+      enabled: true
+  # 아랫부분 추가 대상 (open tracing)
+  kibanaEnabled: true
+  tracing:
+    enabled: true
+    servicename: "eshop-jaeger-agent"
+    serviceport: "6831"
+    traceinterval: "7500"
+  # 윗 부분 추가 대상 (open tracing)
+  high-availability:
+    elasticsearch:
+      enabled: false
+    istio-ingress:
+      enabled: false
+# Auth
+    keycloak:
+      enabled: false
+  image:
+    registry: 505891794208.dkr.ecr.ap-northeast-2.amazonaws.com
+    tag: t2hub
+  sql:
+    ## @param global.sql.host AWS RDS service endpoint
+    ##
+    host: eshop-service-keycloackdb.czohemscyvg4.us-west-2.rds.amazonaws.com          # ex) eshop-service-keycloackdb.cnm5l7zxyphs.us-west-2.rds.amazonaws.com
+    ## @param global.sql.port AWS RDS service port
+    ##
+    port: 3306
+    common:
+      ## @param global.sql.common.user AWS RDS service username
+      ##
+      user: admin
+      pwd: NSJzqfl0hl
+      pid: Developer
+    authservice:
+      db: KeycloakDb        # Keycloak DB
+  authservice:
+    svc: keycloak-http
+    port: 80
+    user: keycloak
+    pwd: keycloak
+keycloak:
+  replica : 1
+  resources:
+    limits:
+      cpu: 1500m
+      memory: 2000Mi
+    requests:
+      cpu: 300m
+      memory: 300Mi
+oauth2-proxy:
+  enabled: true
+# Auth
+# 아랫부분 추가 대상 (open tracing)
+jaeger:
+  provisionDataStore:
+    cassandra: false
+  storage:
+    type: elasticsearch
+    elasticsearch:
+      host: eshop-coordinating-only
+      port: 9200
+elasticsearch:
+  master:
+    replicas: 1
+  coordinating:
+    replicas: 1
+  data:
+    replicas: 1 
+# 윗 부분 추가 대상 (open tracing)

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: eshop-currencyservice
+spec:
+  type: ClusterIP
+  selector:
+    app: eshop-currencyservice
+  ports:
+  - name: api
+    port: 8094
+    targetPort: 8094

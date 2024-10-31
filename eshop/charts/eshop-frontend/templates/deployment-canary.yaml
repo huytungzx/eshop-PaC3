@@ -1,0 +1,39 @@
+# apiVersion: argoproj.io/v1alpha1
+# kind: Rollout
+# metadata:
+#   name: eshop-frontend
+# spec:
+#   replicas: 1
+#   revisionHistoryLimit: 2
+#   selector:
+#     matchLabels:
+#       app: eshop-frontend
+#   template:
+#     metadata:
+#       labels:
+#         app: eshop-frontend
+#     spec:
+#       containers:
+#       - name: eshop-frontend
+#         #태그 수정
+#         #기존
+#         image: 505891794208.dkr.ecr.ap-northeast-2.amazonaws.com/eshop-frontend:previous
+#         #신규
+#         #image: {{ .Values.global.images.frontend }}
+#         imagePullPolicy: Always
+#         ports:
+#         - containerPort: 8080
+#         resources:
+#           requests:
+#             cpu: 100m
+#             memory: 64Mi
+#           limits:
+#             cpu: 200m
+#             memory: 128Mi
+#   strategy:
+#     canary:
+#       #maxSurge: "50%"
+#       #maxUnavailable: 0
+#       steps:
+#       - setWeight: 50
+#       - pause: {}

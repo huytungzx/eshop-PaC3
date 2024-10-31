@@ -1,0 +1,22 @@
+# apiVersion: security.istio.io/v1beta1
+# kind: AuthorizationPolicy
+# metadata:
+#   name: kiali-ingress-policy
+#   namespace: istio-system
+# spec:
+#   selector:
+#     matchLabels:
+#       app: istio-ingressgateway
+#   action: DENY
+#   rules:
+#     # IP Base ACL 미동작
+#     # - from:
+#     #   - source:
+#     #       ipBlocks:
+#     #       - 121.133.133.0/24
+#     #       - 221.167.219.0/24
+#     - to:
+#       - operation:
+#           paths: [
+#             "/kiali*"
+#           ]

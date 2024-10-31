@@ -1,0 +1,570 @@
+## << 변수 >> 치환 필요
+
+## << ECR URI >>      : ex) 123456789012.dkr.ecr.us-east-1.amazonaws.com
+## << SERVICE NAME >> : ex) eshop-backend
+## << TAG >>          : ex) latest
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eshop-fg
+
+#eshop-frontend###
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: eshop-fg
+  name: eshop-frontend
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: eshop-frontend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: eshop-frontend
+    spec:
+      containers:
+      - image: << ECR URI >>/<< SERVICE NAME >>:<< TAG >>
+        imagePullPolicy: Always
+        name: eshop-frontend
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: eshop-fg
+  name: eshop-frontend
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: eshop-frontend
+#eshop-frontend###
+
+#eshop-backend###
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: eshop-fg
+  name: eshop-backend
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: eshop-backend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: eshop-backend
+    spec:
+      containers:
+      - image: << ECR URI >>/<< SERVICE NAME >>:<< TAG >>
+        imagePullPolicy: Always
+        name: eshop-backend
+        ports:
+        - containerPort: 8090
+        env:
+          - name: URL_CARTSERVICE
+            value: http://eshop-cartservice:8091
+          - name: URL_PRODUCTSERVICE
+            value: http://eshop-productservice:8092
+          - name: SPRING_DATASOURCE_URL
+            value: "jdbc:postgresql://postgres:5432/eshop_db"
+          - name: SPRING_RABBITMQ_HOST
+            value: rabbitmq
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: eshop-fg
+  name: eshop-backend
+spec:
+  ports:
+    - port: 8090
+      targetPort: 8090
+      protocol: TCP
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: eshop-backend
+#eshop-backend###
+
+
+#eshop-cartservice###
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: eshop-fg
+  name: eshop-cartservice
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: eshop-cartservice
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: eshop-cartservice
+    spec:
+      containers:
+      - image: << ECR URI >>/<< SERVICE NAME >>:<< TAG >>
+        imagePullPolicy: Always
+        name: eshop-cartservice
+        ports:
+        - containerPort: 8091
+        env:
+          - name: SPRING_REDIS_HOST
+            value: redis
+          - name: SPRING_RABBITMQ_HOST
+            value: rabbitmq
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: eshop-fg
+  name: eshop-cartservice
+spec:
+  ports:
+    - port: 8091
+      targetPort: 8091
+      protocol: TCP
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: eshop-cartservice
+#eshop-cartservice###
+
+#eshop-productservice###
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: eshop-fg
+  name: eshop-productservice
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: eshop-productservice
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: eshop-productservice
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+      - image: << ECR URI >>/<< SERVICE NAME >>:<< TAG >>
+        imagePullPolicy: Always
+        name: eshop-productservice
+        ports:
+        - containerPort: 8092
+        env:
+        - name: PORT
+          value: "8092"
+        - name: MONGO_URI
+          value: "mongodb://admin:password@mongodb"
+        - name: INIT_DATA
+          value: "true"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: eshop-fg
+  name: eshop-productservice
+spec:
+  ports:
+    - name: api
+      port: 8092
+      targetPort: 8092
+      protocol: TCP
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: eshop-productservice
+#eshop-productservice###
+
+#eshop-adservice###
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: eshop-fg
+  name: eshop-adservice
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: eshop-adservice
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: eshop-adservice
+    spec:
+      containers:
+      - image: << ECR URI >>/<< SERVICE NAME >>:<< TAG >>
+        imagePullPolicy: Always
+        name: eshop-adservice
+        ports:
+          - containerPort: 8095
+        env:
+          - name: SPRING_DATASOURCE_URL
+            value: "jdbc:postgresql://postgres:5432/eshop_db"
+          # - name: SPRING_PROFILES_ACTIVE
+          #   value: "chaos-monkey"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: eshop-fg
+  name: eshop-adservice
+spec:
+  ports:
+    - port: 8095
+      targetPort: 8095
+      protocol: TCP
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: eshop-adservice
+#eshop-adservice###
+
+#eshop-currencyservice###
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: eshop-fg
+  name: eshop-currencyservice
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: eshop-currencyservice
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: eshop-currencyservice
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: eshop-currencyservice
+        image: << ECR URI >>/<< SERVICE NAME >>:<< TAG >>
+        ports:
+        - containerPort: 8094
+        env:
+        - name: PORT
+          value: "8094"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: eshop-fg
+  name: eshop-currencyservice
+spec:
+  ports:
+  - name: api
+    port: 8094
+    targetPort: 8094
+    protocol: TCP
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: eshop-currencyservice
+#eshop-currencyservice###
+
+#eshop-recommendservice###
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: eshop-fg
+  name: eshop-recommendservice
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: eshop-recommendservice
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: eshop-recommendservice
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: eshop-recommendservice
+        image: << ECR URI >>/<< SERVICE NAME >>:<< TAG >>
+        ports:
+        - containerPort: 8093
+        env:
+          - name: URL_PRODUCTSERVICE
+            value: http://eshop-productservice:8092
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: eshop-fg
+  name: eshop-recommendservice
+spec:
+  ports:
+  - name: api
+    port: 8093
+    targetPort: 8093
+    protocol: TCP
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: eshop-recommendservice
+#eshop-frontend###
+
+
+
+
+#eshop-ingress###
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: eshop-fg
+  name: eshop-ingress
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: eshop-frontend
+              port:
+                number: 8080
+        - path: /api
+          pathType: Prefix
+          backend:
+            service:
+              name: eshop-backend
+              port:
+                number: 8090
+        - path: /static
+          pathType: Prefix
+          backend:
+            service:
+              name: eshop-backend
+              port:
+                number: 8090
+        - path: /api/carts
+          pathType: Prefix
+          backend:
+            service:
+              name: eshop-cartservice
+              port:
+                number: 8091
+        - path: /api/products
+          pathType: Prefix
+          backend:
+            service:
+              name: eshop-productservice
+              port:
+                number: 8092
+        - path: /api/recommends
+          pathType: Prefix
+          backend:
+            service:
+              name: eshop-recommendservice
+              port:
+                number: 8093
+        - path: /api/currencies
+          pathType: Prefix
+          backend:
+            service:
+              name: eshop-currencyservice
+              port:
+                number: 8094
+        - path: /api/ads
+          pathType: Prefix
+          backend:
+            service:
+              name: eshop-adservice
+              port:
+                number: 8095
+#eshop-ingress###
+
+#postgres###
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: eshop-fg
+  name: postgres
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:13
+        env:
+          - name: POSTGRES_USER
+            value: eshop_user
+          - name: POSTGRES_DB
+            value: eshop_db
+          - name: POSTGRES_PASSWORD
+            value: password
+        ports:
+        - containerPort: 5432
+        resources:
+          limits:
+            memory: 512Mi
+            cpu: 500m
+          requests:
+            cpu: 300m
+            memory: 384Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: eshop-fg
+  name: postgres
+spec:
+  type: ClusterIP
+  selector:
+    app: postgres
+  ports:
+  - port: 5432
+#postgres###
+
+#mongodb###
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: eshop-fg
+  name: mongodb
+spec:
+  serviceName: mongodb
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+        selector: mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:4.0.20
+        env:
+          - name: MONGO_INITDB_ROOT_USERNAME
+            value: admin
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            value: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: eshop-fg
+  name: mongodb
+  labels:
+    app: mongodb
+spec:
+  clusterIP: None
+  selector:
+    app: mongodb
+#mongodb###
+
+#rabbitmq###
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: eshop-fg
+  name: rabbitmq
+spec:
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+      - name: rabbitmq
+        image: rabbitmq:3.8.9-alpine
+        ports:
+        - containerPort: 5672
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: eshop-fg
+  name: rabbitmq
+spec:
+  type: ClusterIP
+  selector:
+    app: rabbitmq
+  ports:
+  - port: 5672
+#rabbitmq###
+
+#redis###
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: eshop-fg
+  name: redis
+spec:
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:5.0-alpine
+        ports:
+        - containerPort: 6379
+        volumeMounts:
+        - mountPath: /data
+          name: redis-data
+        resources:
+          limits:
+            memory: 512Mi
+            cpu: 500m
+          requests:
+            cpu: 300m
+            memory: 384Mi
+      volumes:
+      - name: redis-data
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: eshop-fg
+  name: redis
+spec:
+  type: ClusterIP
+  selector:
+    app: redis
+  ports:
+  - port: 6379
+#redis###

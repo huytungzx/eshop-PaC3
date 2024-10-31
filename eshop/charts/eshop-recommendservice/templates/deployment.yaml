@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eshop-recommendservice
+spec:
+  selector:
+    matchLabels:
+      app: eshop-recommendservice
+  template:
+    metadata:
+      labels:
+        app: eshop-recommendservice
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: eshop-recommendservice
+        image: {{ .Values.global.images.recommendservice }}
+        ports:
+        - containerPort: 8093
+        env:
+          - name: URL_PRODUCTSERVICE
+            value: http://eshop-productservice:8092

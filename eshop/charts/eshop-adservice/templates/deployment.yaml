@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eshop-adservice
+  # annotations:
+  #   "sidecar.jaegertracing.io/inject": "true"
+spec:
+  selector:
+    matchLabels:
+      app: eshop-adservice
+  template:
+    metadata:
+      labels:
+        app: eshop-adservice
+      # annotations:
+      #   sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+        - name: eshop-adservice
+          image: {{ .Values.global.images.adservice }}
+          ports:
+          - containerPort: 8095
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://postgres:5432/eshop_db"
+            # - name: SPRING_PROFILES_ACTIVE
+            #   value: "chaos-monkey"  

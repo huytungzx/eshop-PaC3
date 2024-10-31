@@ -1,0 +1,94 @@
+## eshop Virtual Service
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: eshop-vs
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - ingress-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /api/carts
+    route:
+    - destination:
+        host: eshop-cartservice
+        port:
+          number: 8091
+  - match:
+    - uri:
+        prefix: /api/products
+    route:
+    - destination:
+        host: eshop-productservice
+        port:
+          number: 8092
+  - match:
+    - uri:
+        prefix: /api/recommends
+    route:
+    - destination:
+        host: eshop-recommendservice
+        port:
+          number: 8093
+  - match:
+    - uri:
+        prefix: /api/currencies
+    route:
+    - destination:
+        host: eshop-currencyservice
+        port:
+          number: 8094
+  - match:
+    - uri:
+        prefix: /api/ads
+    route:
+    - destination:
+        host: eshop-adservice
+        port:
+          number: 8095
+  - match:
+    - uri:
+        prefix: /api
+    route:
+    - destination:
+        host: eshop-backend
+        port:
+          number: 8090
+  - match:
+    - uri:
+        prefix: /static
+    route:
+    - destination:
+        host: eshop-backend
+        port:
+          number: 8090         
+  - match:
+    - uri:
+        exact: /
+    - uri:
+        exact: /favicon.ico
+    - uri:
+        prefix: /css
+    - uri:
+        prefix: /js
+    route:
+    - destination:
+        host: eshop-frontend
+        port:
+          number: 8080
+    # route:
+    # - destination:
+    #     host: eshop-frontend
+    #     subset: v1
+    #     port:
+    #       number: 8080
+    #   weight: 50
+    # - destination:
+    #     host: eshop-frontend
+    #     subset: v2
+    #     port:
+    #       number: 8080
+    #   weight: 50

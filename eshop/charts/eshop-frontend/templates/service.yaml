@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: eshop-frontend
+spec:
+  type: ClusterIP
+  selector:
+    app: eshop-frontend
+  ports:
+  - port: 8080

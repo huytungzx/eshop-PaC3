@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eshop-productservice
+spec:
+  selector:
+    matchLabels:
+      app: eshop-productservice
+  template:
+    metadata:
+      labels:
+        app: eshop-productservice
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: eshop-productservice
+        image: {{ .Values.global.images.productservice }}
+        ports:
+        - containerPort: 8092
+        env:
+        - name: PORT
+          value: "8092"
+        - name: MONGO_URI
+          value: "mongodb://admin:password@mongodb"
+        - name: INIT_DATA
+          value: "true"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+---
+# apiVersion: autoscaling/v1
+# kind: HorizontalPodAutoscaler
+# metadata:
+#   name: eshop-productservice
+# spec:
+#   scaleTargetRef:
+#     apiVersion: apps/v1
+#     kind: Deployment
+#     name: eshop-productservice
+#   minReplicas: 2
+#   maxReplicas: 10
+#   targetCPUUtilizationPercentage: 25
